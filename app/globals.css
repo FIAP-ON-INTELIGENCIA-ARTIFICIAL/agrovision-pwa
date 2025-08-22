@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --agroview-primary: #003840;
+  --agroview-secondary: #005A5B;
+  --agroview-accent: #007369;
+  --agroview-success: #008C72;
+  --agroview-light: #02A676;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 56, 64;
+  --background-end-rgb: 0, 90, 91;
+}
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 180 100% 25%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 180 89% 22%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background: linear-gradient(135deg, var(--agroview-primary) 0%, var(--agroview-secondary) 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .agroview-card {
+    @apply bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl shadow-lg backdrop-blur-sm;
+  }
+  
+  .agroview-btn-primary {
+    @apply bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg;
+  }
+  
+  .agroview-input {
+    @apply bg-slate-800 border border-slate-600 text-white placeholder-slate-400 rounded-lg px-3 py-2 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors;
+  }
+  
+  .agroview-select {
+    @apply bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors;
+  }
+}
