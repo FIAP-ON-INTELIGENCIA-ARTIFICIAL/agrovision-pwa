@@ -1,25 +1,47 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StatCard } from '@/components/ui/StatCard';
 import { Panel } from '@/components/ui/Panel';
-import { BarChart3, Droplets, Thermometer, Target, CloudRain, AlignCenter } from 'lucide-react';
+import { BarChart3, Droplets, Thermometer, Target, CloudRain } from 'lucide-react';
 import { apiService, StatsResponse, WeatherResponse } from '@/services/apiService';
-import { mockRecords, mockStatsValues } from '@/lib/mockData';
+// import { mockRecords, mockStatsValues } from '@/lib/mockData'; // <- REMOVIDO
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { db } from '@/firebase/client'; // <- ajuste o caminho
+
+type FireRegistro = {
+  id: string;
+  culture: string;          // 'soja' | 'milho' | 'cafe' (string)
+  produto: string;
+  area: number | null;      // ha (para soja/milho)
+  dose: number | null;      // L/ha (para soja/milho)
+  ruas: number | null;      // (café)
+  comprimentoRua: number | null; // m (café)
+  doseMlM: number | null;   // mL/m (café)
+  litros: number;           // total calculado
+  details: string;
+  createdAt?: any;          // Firestore Timestamp
+};
 
 export default function Dashboard() {
   const [statsData, setStatsData] = useState<StatsResponse | null>(null);
   const [weatherData, setWeatherData] = useState<WeatherResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Registros do Firestore
+  const [records, setRecords] = useState<FireRegistro[]>([]);
+  const [recordsLoading, setRecordsLoading] = useState(true);
+  const [recordsError, setRecordsError] = useState<string | null>(null);
+
+  // ---------- Carrega Stats/Weather (mantive como estava) ----------
   useEffect(() => {
     const loadData = async () => {
       try {
         const [stats, weather] = await Promise.all([
-          apiService.getStats({ valores: mockStatsValues }),
+          // Se quiser, substitua mockStatsValues por valores reais depois
+          apiService.getStats({ valores: [12, 20, 18, 5, 40, 22, 15] }),
           apiService.getWeatherSummary({ lat: -23.5505, lon: -46.6333, dias: 7 })
         ]);
-        
         setStatsData(stats);
         setWeatherData(weather);
       } catch (error) {
@@ -28,20 +50,55 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
-
     loadData();
   }, []);
 
-  const totalArea = mockRecords.reduce((sum, record) => sum + record.area_ha, 0);
-  const totalLiters = mockRecords.reduce((sum, record) => {
-    if (record.cultura === 'Café' && record.ruas && record.comp_rua_m && record.dose_ml_m) {
-      return sum + (record.ruas * record.comp_rua_m * record.dose_ml_m) / 1000;
-    }
-    if (record.dose_l_ha) {
-      return sum + (record.dose_l_ha * record.area_ha);
-    }
-    return sum;
-  }, 0);
+  // ---------- Carrega registros do Firestore ----------
+  useEffect(() => {
+    const fetchRecords = async () => {
+      setRecordsLoading(true);
+      setRecordsError(null);
+      try {
+        // coleção informada por você: 'insumos_calculos' (sem "a")
+        const q = query(collection(db, 'insumos_calculos'), orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+        const list: FireRegistro[] = snap.docs.map((d) => {
+          const data = d.data() as any;
+          return {
+            id: d.id,
+            culture: data.culture ?? '',
+            produto: data.produto ?? '',
+            area: data.area ?? null,
+            dose: data.dose ?? null,
+            ruas: data.ruas ?? null,
+            comprimentoRua: data.comprimentoRua ?? null,
+            doseMlM: data.doseMlM ?? null,
+            litros: Number(data.litros ?? 0),
+            details: data.details ?? '',
+            createdAt: data.createdAt,
+          };
+        });
+        setRecords(list);
+      } catch (e: any) {
+        console.error(e);
+        setRecordsError(e?.message || 'Falha ao carregar registros.');
+      } finally {
+        setRecordsLoading(false);
+      }
+    };
+    fetchRecords();
+  }, []);
+
+  // ---------- KPIs a partir do Firestore ----------
+  const totalArea = useMemo(
+    () => records.reduce((sum, r) => sum + (r.area ?? 0), 0),
+    [records]
+  );
+
+  const totalLiters = useMemo(
+    () => records.reduce((sum, r) => sum + (r.litros ?? 0), 0),
+    [records]
+  );
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -52,7 +109,7 @@ export default function Dashboard() {
         <p className="text-slate-300">Gestão inteligente de culturas</p>
       </div>
 
-      {/* KPIs */}
+      {/* KPIs (usando Firestore) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Área Total"
@@ -68,9 +125,9 @@ export default function Dashboard() {
         />
         <StatCard
           title="Registros Ativos"
-          value={mockRecords.length}
+          value={recordsLoading ? '...' : records.length}
           icon={BarChart3}
-          subtitle="Culturas monitoradas"
+          subtitle="Coletados do Firebase"
         />
         <StatCard
           title="Status Sincronização"
@@ -109,8 +166,9 @@ export default function Dashboard() {
                   <p className="text-xl font-semibold text-white">{statsData.min}/{statsData.max} mm</p>
                 </div>
               </div>
+              {/* Você pode trocar essa linha para listar valores reais do Firestore quando tiver um campo de chuva */}
               <div className="text-xs text-slate-500 mt-4">
-                Análise de precipitação dos registros: {mockStatsValues.join(', ')} mm
+                Análise de precipitação (demo)
               </div>
             </div>
           ) : (
@@ -161,45 +219,70 @@ export default function Dashboard() {
         </Panel>
       </div>
 
-      {/* Registros */}
+      {/* Registros (Firebase) */}
       <Panel title="Registros Recentes">
-        <div className="space-y-4">
-          {mockRecords.map((record) => (
-            <div key={record.id} className="bg-slate-800 p-4 rounded-lg border border-slate-600">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${
-                      record.cultura === 'Soja' ? 'bg-green-500' :
-                      record.cultura === 'Milho' ? 'bg-yellow-500' : 'bg-amber-600'
-                    }`}></div>
-                    <span className="font-medium text-white">{record.cultura}</span>
-                    <span className="text-slate-400">•</span>
-                    <span className="text-slate-300">{record.produto}</span>
+        {recordsLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-20 bg-slate-800/80 rounded-lg animate-pulse" />
+            ))}
+          </div>
+        ) : recordsError ? (
+          <p className="text-slate-400">{recordsError}</p>
+        ) : records.length === 0 ? (
+          <p className="text-slate-400">Sem registros no momento.</p>
+        ) : (
+          <div className="space-y-4">
+            {records.map((record) => (
+              <div key={record.id} className="bg-slate-800 p-4 rounded-lg border border-slate-600">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          record.culture?.toLowerCase() === 'soja'
+                            ? 'bg-green-500'
+                            : record.culture?.toLowerCase() === 'milho'
+                            ? 'bg-yellow-500'
+                            : 'bg-amber-600'
+                        }`}
+                      />
+                      <span className="font-medium text-white capitalize">
+                        {record.culture || '—'}
+                      </span>
+                      <span className="text-slate-400">•</span>
+                      <span className="text-slate-300">{record.produto || '—'}</span>
+                    </div>
+
+                    <div className="mt-2 text-sm text-slate-400 space-y-1">
+                      {/* Área / Dose (soja/milho) */}
+                      {record.area != null && record.dose != null && (
+                        <p>Área: {record.area} ha • Dose: {record.dose} L/ha</p>
+                      )}
+
+                      {/* Café */}
+                      {record.ruas != null && record.comprimentoRua != null && record.doseMlM != null && (
+                        <p>
+                          Ruas: {record.ruas} • Comp: {record.comprimentoRua} m • Dose: {record.doseMlM} mL/m
+                        </p>
+                      )}
+
+                      {/* Detalhes */}
+                      {record.details && <p>Fórmula: {record.details}</p>}
+                    </div>
                   </div>
-                  <div className="mt-2 text-sm text-slate-400 space-y-1">
-                    <p>Área: {record.area_ha} ha • Chuva: {record.chuva_mm} mm</p>
-                    {record.ruas && (
-                      <p>Ruas: {record.ruas} • Comp: {record.comp_rua_m}m • Dose: {record.dose_ml_m} mL/m</p>
-                    )}
-                    {record.dose_l_ha && (
-                      <p>Dose: {record.dose_l_ha} L/ha</p>
-                    )}
+
+                  <div className="text-right">
+                    <div className="text-lg font-semibold text-teal-400">
+                      {record.litros != null ? `${record.litros.toFixed(1)} L` : 'N/A'}
+                    </div>
+                    <div className="text-xs text-slate-400">Total necessário</div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-semibold text-teal-400">
-                    {record.cultura === 'Café' && record.ruas && record.comp_rua_m && record.dose_ml_m 
-                      ? `${((record.ruas * record.comp_rua_m * record.dose_ml_m) / 1000).toFixed(1)} L`
-                      : record.dose_l_ha ? `${(record.dose_l_ha * record.area_ha).toFixed(1)} L` : 'N/A'
-                    }
-                  </div>
-                  <div className="text-xs text-slate-400">Total necessário</div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </Panel>
     </div>
   );
