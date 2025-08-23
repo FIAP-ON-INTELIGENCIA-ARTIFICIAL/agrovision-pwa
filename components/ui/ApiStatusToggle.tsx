@@ -28,8 +28,8 @@ export function ApiStatusToggle() {
           </>
         ) : (
           <>
-            <WifiOff className="w-3 h-3" />
-            <span>Modo Mock</span>
+            {/* <WifiOff className="w-3 h-3" />
+            <span>Modo Mock</span> */}
           </>
         )}
       </div>

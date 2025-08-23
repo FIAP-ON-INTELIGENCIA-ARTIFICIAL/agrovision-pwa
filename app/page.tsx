@@ -196,12 +196,6 @@ export default function Dashboard() {
         <StatCard title="Área Total" value={`${totalArea.toFixed(1)} ha`} icon={Target} subtitle="Todas as culturas (carregadas)" />
         <StatCard title="Insumos Necessários" value={`${totalLiters.toFixed(1)} L`} icon={Droplets} subtitle="Total calculado (carregado)" />
         <StatCard title="Registros Carregados" value={recordsLoading ? '...' : records.length} icon={BarChart3} subtitle="Do Firebase" />
-        <StatCard
-          title="Status Sincronização"
-          value={apiService.isMockMode() ? 'Mock' : 'Online'}
-          icon={CloudRain}
-          subtitle={apiService.isMockMode() ? 'Dados de teste' : 'API conectada'}
-        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
