@@ -19,9 +19,6 @@ export function Navigation() {
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-8">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-12 h-12 bg-gradient-to-r to-emerald-500 rounded-lg flex items-center justify-center">
-              <img src="/logo.png" alt="AgroVision Logo" className="w-6 h-6" />
-            </div>
             <span className="text-xl font-bold text-white">AgroVision</span>
           </Link>
           

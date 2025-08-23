@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { StatCard } from '@/components/ui/StatCard';
 import { Panel } from '@/components/ui/Panel';
-import { BarChart3, Droplets, Thermometer, Target, CloudRain } from 'lucide-react';
+import { BarChart3, Droplets, Thermometer, Target, CloudRain, AlignCenter } from 'lucide-react';
 import { apiService, StatsResponse, WeatherResponse } from '@/services/apiService';
 import { mockRecords, mockStatsValues } from '@/lib/mockData';
 
@@ -46,6 +46,7 @@ export default function Dashboard() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
+      <img src="/logo.png" alt="AgroVision Logo" className='w-64 h-64' style={{ display: 'block', margin: '0 auto' }} />
       <div className="text-center space-y-2">
         <h1 className="text-3xl lg:text-4xl font-bold text-white">Dashboard Agrícola</h1>
         <p className="text-slate-300">Gestão inteligente de culturas</p>
