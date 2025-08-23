@@ -19,10 +19,10 @@ export function Navigation() {
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-8">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-lg flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 bg-gradient-to-r to-emerald-500 rounded-lg flex items-center justify-center">
+              <img src="/logo.png" alt="AgroVision Logo" className="w-6 h-6" />
             </div>
-            <span className="text-xl font-bold text-white">AgroView</span>
+            <span className="text-xl font-bold text-white">AgroVision</span>
           </Link>
           
           <div className="hidden md:flex items-center space-x-1">

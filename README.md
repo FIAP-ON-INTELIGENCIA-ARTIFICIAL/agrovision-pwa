@@ -1,6 +1,10 @@
-# AgroView - Dashboard Agrícola PWA
+<p align="center">
+  <img src="./logo-agrovision.png" alt="AgroVision Logo" width="100%" />
+</p>
 
-AgroView é uma aplicação web progressiva (PWA) moderna para gestão de culturas agrícolas, desenvolvida com Next.js e projetada para funcionar tanto com dados mock quanto com APIs externas.
+# AgroVision - Dashboard Agrícola PWA
+
+AgroVision é uma aplicação web progressiva (PWA) moderna para gestão de culturas agrícolas, desenvolvida com Next.js e projetada para funcionar tanto com dados mock quanto com APIs externas.
 
 ## 🌾 Funcionalidades
 
@@ -135,11 +139,11 @@ def get_stats():
 ### Manifest
 - Instalável como app nativo
 - Ícones otimizados (192x192, 512x512)
-- Tema personalizado com paleta AgroView
+- Tema personalizado com paleta AgroVision
 
 ### Instalação
 Os usuários podem instalar o app através do navegador:
-- Chrome: "Instalar AgroView"
+- Chrome: "Instalar AgroVision"
 - Safari: "Adicionar à Tela Inicial"
 
 ## 🎨 Design System
@@ -252,4 +256,4 @@ Este projeto é livre para uso educacional e comercial.
 
 ---
 
-**AgroView** - Transformando dados agrícolas em insights inteligentes 🌱
+**AgroVision** - Transformando dados agrícolas em insights inteligentes 🌱

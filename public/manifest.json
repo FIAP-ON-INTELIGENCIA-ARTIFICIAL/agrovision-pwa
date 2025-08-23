@@ -1,6 +1,6 @@
 {
-  "name": "AgroView - Dashboard Agrícola",
-  "short_name": "AgroView",
+  "name": "AgroVision - Dashboard Agrícola",
+  "short_name": "AgroVision",
   "description": "Dashboard agrícola moderno para gestão de culturas",
   "start_url": "/",
   "display": "standalone",

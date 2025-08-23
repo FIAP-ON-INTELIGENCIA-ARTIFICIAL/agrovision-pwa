@@ -7,7 +7,7 @@ import { Navigation } from '@/components/layout/Navigation';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AgroView - Dashboard Agrícola',
+  title: 'AgroVision - Dashboard Agrícola',
   description: 'Dashboard moderno para gestão de culturas agrícolas',
   manifest: '/manifest.json',
   themeColor: '#007369',
