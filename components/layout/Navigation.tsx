@@ -42,9 +42,7 @@ export function Navigation() {
               );
             })}
           </div>
-        </div>
-        
-        <ApiStatusToggle />
+        </div>                
       </div>
       
       {/* Mobile Navigation */}
