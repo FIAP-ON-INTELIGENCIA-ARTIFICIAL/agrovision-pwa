@@ -31,13 +31,26 @@ const mockWeatherData: WeatherResponse = {
   dias: 7
 };
 
-const mockStatsData = (valores: number[]): StatsResponse => ({
-  n: valores.length,
-  media: valores.reduce((a, b) => a + b, 0) / valores.length,
-  desvio: Math.sqrt(valores.reduce((sq, n, _, arr) => sq + Math.pow(n - arr.reduce((a, b) => a + b) / arr.length, 2), 0) / valores.length),
-  min: Math.min(...valores),
-  max: Math.max(...valores)
-});
+const mockStatsData = (valores: number[]): StatsResponse => {
+  const n = valores.length;
+
+  if (n === 0) {
+    return { n: 0, media: 0, desvio: 0, min: 0, max: 0 };
+  }
+
+  const media = valores.reduce((a, b) => a + b, 0) / n;
+  const desvio = Math.sqrt(
+    valores.reduce((sq, v) => sq + Math.pow(v - media, 2), 0) / n
+  );
+
+  return {
+    n,
+    media,
+    desvio,
+    min: Math.min(...valores),
+    max: Math.max(...valores)
+  };
+};
 
 class ApiService {
   private baseUrl: string;
